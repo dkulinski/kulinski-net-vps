@@ -1,0 +1,30 @@
+/* h2 { width: 70%; border-bottom: 1px solid black; } */
+h2 { width: 70%; border-bottom: 1px solid black; background-color: grey; color: white; padding-left: 1em; font-size: 16pt;}
+
+body { margin-left: 2em; }
+
+a:link { color: black; }
+a:visited { color: grey; }
+a:hover { color: grey; }
+
+.left { float: left; width 45%; }
+.right { float: left; width: 35%; padding-left: 10%; }
+
+div#address { margin-left: 0.5em; font-variant: small-caps; }
+div#skills ul { font-size: 14pt; line-height: 1em; }
+div#skills { page-break-after: always; }
+
+div#objective { font-size: 14pt; }
+
+div#history { clear: left; padding-top: 0.5em; }
+div#history .historyItem h3 { font-variant: small-caps; font-size: 14pt; font-weight: bold; }
+div#history .right { text-align: right; }
+div#history ul { font-size: 12pt; line-height: 1em; }
+
+div#education ul { font-size: 12pt; line-height: 1em; }
+div#education h3 { font-variant: small-caps; font-size: 12pt; font-weight: bold; }
+div#education h3.left { text-wrap: normal; width: 13%;}
+.clear { clear: both; }
+
+div#footer { width: 70%; font-size: 8pt; margin-top: 1em; }
+div#name { font-size: 32; font-weight: bold; font-variant: small-caps; text-align:center}

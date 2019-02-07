@@ -1,0 +1,41 @@
+---
+- hosts: all
+  tasks:
+    - name: Deploy overambitio.us
+      block:
+      - copy:
+          src: /home/dan/.ssh/id_rsa
+          dest: /tmp/github.key
+          mode: 0600
+          owner: dan
+      - git:
+          accept_hostkey: true
+          repo:  "git@github.com:dkulinski/overambitio.us.git"
+          key_file: "/tmp/github.key"
+          dest: "/home/dan/overambitio.us"
+      - command: jekyll b -s /home/dan/overambitio.us -d /var/www/overambitio.us
+    - name: Deploy nonhazardo.us
+      block:
+      - git:
+          accept_hostkey: true
+          repo:  "git@github.com:dkulinski/nonhazardo.us.git"
+          key_file: "/tmp/github.key"
+          dest: "/home/dan/nonhazardo.us"
+      - command: jekyll b -s /home/dan/nonhazardo.us -d /var/www/nonhazardo.us
+    - name: Deploy resume.kulinski.net
+      block:
+        - file:
+            path: /home/dan/public_html
+            state: directory
+            owner: dan
+            group: www-data
+          become: true
+        - copy:
+            src: "files/"
+            dest: "/home/dan/public_html/"
+            mode: 0666
+      become: false
+      always:
+      - file:
+          name: /tmp/github.key
+          state: absent

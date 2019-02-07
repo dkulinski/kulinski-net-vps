@@ -1,0 +1,85 @@
+---
+- hosts: all
+  become: true
+  vars:
+    bind_allow_query:
+      - any
+    bind_listen_ipv4:
+      - any
+    bind_acls:
+      - name: buddy_dns_servers
+        match_list:
+          - 173.244.206.26
+          - 88.198.106.11
+    bind_zone_master_server_ip: '{{ ansible_default_ipv4.address }}'
+    bind_zone_domains:
+      - name: kulinski.net
+        networks:
+          - '192.23.134.202'
+        name_servers:
+          - ns1.kulinski.net.
+          - d.ns.buddyns.com.
+          - b.ns.buddyns.com.
+        hostmaster_email: dan
+        hosts:
+          - name: ns1
+            ip: '{{ ansible_default_ipv4.address }}'
+          - name: '@'
+            ip: '{{ ansible_default_ipv4.address }}'
+            aliases:
+              - www
+              - vps
+              - resume
+          - name: old
+            ip: 192.23.134.202
+          - name: ghs.google.com.
+            aliases:
+              - email
+              - start
+              - calendar
+              - pages
+              - docs
+              - sites
+        mail_servers:
+          - name: ASPMX.L.GOOGLE.COM.
+            preference: 1
+          - name: ALT1.ASPMX.L.GOOGLE.COM.
+            preference: 5
+          - name: ALT2.ASPMX.L.GOOGLE.COM.
+            preference: 5
+          - name: ASPMX2.GOOGLEMAIL.COM.
+            preference: 10
+          - name: ASPMX3.GOOGLEMAIL.COM.
+            preference: 10
+      - name: overambitio.us
+        networks:
+          - '10.1.1'
+        name_servers:
+          - ns1.overambitio.us.
+          - d.ns.buddyns.com.
+          - b.ns.buddyns.com.
+        hostmaster_email: dan
+        hosts:
+          - name: ns1
+            ip: '{{ ansible_default_ipv4.address }}'
+          - name: '@'
+            ip: '{{ ansible_default_ipv4.address }}'
+            aliases:
+              - www
+      - name: nonhazardo.us
+        networks:
+          - '10.1.2'
+        name_servers:
+          - ns1.nonhazardo.us.
+          - d.ns.buddyns.com.
+          - b.ns.buddyns.com.
+        hostmaster_email: dan
+        hosts:
+          - name: ns1
+            ip: '{{ ansible_default_ipv4.address }}'
+          - name: '@'
+            ip: '{{ ansible_default_ipv4.address }}'
+            aliases:
+              - www
+  roles:
+    - bertvv.bind

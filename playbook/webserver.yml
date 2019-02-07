@@ -1,0 +1,115 @@
+---
+- hosts: all
+  become: true
+  vars:
+    apache_listen_ip: "*"
+    apache_listen_port: 80
+    apache_listen_port_ssl: 443
+    apache_ignore_missing_ssl_certificate: true
+    apache_vhosts:
+      - servername: "kulinski.net"
+        serveralias: "www.kulinski.net"
+        documentroot: "/var/www/html"
+        extra_parameters: |
+          Redirect permanent / https://kulinski.net
+      - servername: "overambitio.us"
+        serveralias: "www.overambitio.us"
+        documentroot: "/var/www/overambitio.us"
+        extra_parameters: |
+          Redirect permanent / https://overambitio.us
+      - servername: "nonhazardo.us"
+        serveralias: "www.nonhazardo.us"
+        documentroot: "/var/www/nonhazardo.us"
+        extra_parameters: |
+          Redirect permanent / https://nonhazardo.us
+      - servername: "resume.kulinski.net"
+        documentroot: "/home/dan/public_html"
+        extra_parameters: |
+          DirectoryIndex cv.html
+          Redirect permanent / https://resume.kulinski.net
+    apache_vhosts_ssl:
+      - servername: "kulinski.net"
+        documentroot: "/var/www/html"
+        certificate_file: "/etc/letsencrypt/live/kulinski.net/cert.pem"
+        certificate_key_file: "/etc/letsencrypt/live/kulinski.net/privkey.pem"
+        certificate_chain_file: "/etc/letsencrypt/live/kulinski.net/chain.pem"
+      - servername: "nonhazardo.us"
+        documentroot: "/var/www/nonhazardo.us"
+        certificate_file: "/etc/letsencrypt/live/kulinski.net/cert.pem"
+        certificate_key_file: "/etc/letsencrypt/live/kulinski.net/privkey.pem"
+        certificate_chain_file: "/etc/letsencrypt/live/kulinski.net/chain.pem"
+      - servername: "overambitio.us"
+        documentroot: "/var/www/overambitio.us"
+        certificate_file: "/etc/letsencrypt/live/kulinski.net/cert.pem"
+        certificate_key_file: "/etc/letsencrypt/live/kulinski.net/privkey.pem"
+        certificate_chain_file: "/etc/letsencrypt/live/kulinski.net/chain.pem"
+      - servername: "resume.kulinski.net"
+        documentroot: "/home/dan/public_html"
+        certificate_file: "/etc/letsencrypt/live/resume.kulinski.net/cert.pem"
+        certificate_key_file: "/etc/letsencrypt/live/resume.kulinski.net/privkey.pem"
+        certificate_chain_file: "/etc/letsencrypt/live/resume.kulinski.net/chain.pem"
+        extra_parameters: |
+          DirectoryIndex cv.html
+    certbot_auto_renew: true
+    certbot_auto_renew_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+    certbot_auto_renew_hour: 3
+    certbot_auto_renew_minute: 30
+    certbot_auto_renew_options: "--quiet --no-self-upgrade"
+    certbot_create_if_missing: true
+    certbot_create_method: standalone
+    certbot_admin_email: daniel@kulinski.net
+    certbot_certs:
+      - domains:
+        - kulinski.net
+        - nonhazardo.us
+        - overambitio.us
+        - www.kulinski.net
+        - www.nonhazardo.us
+        - www.overambitio.us
+      - domains:
+        - resume.kulinski.net
+    certbot_create_standalone_stop_services:
+      - apache2
+  tasks:
+    - name: remove nginx
+      apt:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - nginx
+        - nginx-core
+        - nginx-common
+    - name: install openssl
+      apt:
+        name: openssl
+        state: present
+    - name: install git
+      apt:
+        name: git
+        state: present
+    - name: install webserver components
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apache2
+        - build-essential
+        - ruby
+        - ruby-dev
+    - name: install jekyll
+      gem:
+        name: jekyll
+        user_install: no
+        state: present
+    - name: create site directories
+      file:
+        name: "{{ item }}"
+        owner: dan
+        group: www-data
+        state: directory
+      with_items:
+        - /var/www/overambitio.us
+        - /var/www/nonhazardo.us
+  roles:
+    - geerlingguy.certbot
+    - geerlingguy.apache

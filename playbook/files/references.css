@@ -1,0 +1,4 @@
+body { width: 70%; }
+.title { border-bottom: 1px solid black; text-align: center; font-size: 16pt; font-weight: bold; }
+.reference h2 { font-size: 14pt; font-variant: small-caps; }
+.reference ul { list-style-type: none; line-spacing: 1em; }

@@ -1,0 +1,50 @@
+---
+- hosts: vps
+  become: true
+  tasks:
+    - name: IP Address
+      debug: var=ansible_default_ipv4.address
+    - name: Remove vpsadmin user
+      user:
+        name: vpsadmin
+        state: absent
+    - name: Update sudo configuration
+      lineinfile:
+        path: '/etc/sudoers'
+        regexp: '%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD:ALL'
+    - name: Disable root login
+      lineinfile:
+        path: '/etc/ssh/sshd_config'
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+    - name: Create salt
+      command: openssl rand -hex 12
+      register: salt
+    - name: Password for dan
+      command: openssl rand -base64 24 creates=/home/dan
+      register: dan_password
+    - name: Encrypted password
+      command: openssl passwd -salt {{salt.stdout}} -1 {{dan_password.stdout}}
+      register: enc_passwd
+      when: dan_password.changed
+    - name: User password
+      debug:
+        msg: "Password for dan is {{dan_password.stdout}}"
+      when: dan_password.changed
+    - name: Add user dan
+      user: 
+        name: dan
+        comment: "Dan Kulinski"
+        uid: 1000
+        groups: sudo,adm
+        password: "{{enc_passwd.stdout}}"
+        shell: "/bin/bash"
+      when: dan_password.changed
+    - name: Add SSH key
+      authorized_key:
+        user: dan
+        key: "{{ lookup('file', '/home/dan/.ssh/id_rsa.pub') }}"
+        manage_dir: yes
+        state: present
