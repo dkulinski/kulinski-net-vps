@@ -23,7 +23,7 @@
         extra_parameters: |
           Redirect permanent / https://nonhazardo.us
       - servername: "resume.kulinski.net"
-        documentroot: "/home/dan/public_html"
+        documentroot: "/var/www/cv"
         extra_parameters: |
           DirectoryIndex cv.html
           Redirect permanent / https://resume.kulinski.net
@@ -45,9 +45,9 @@
         certificate_chain_file: "/etc/letsencrypt/live/kulinski.net/chain.pem"
       - servername: "resume.kulinski.net"
         documentroot: "/home/dan/public_html"
-        certificate_file: "/etc/letsencrypt/live/resume.kulinski.net/cert.pem"
-        certificate_key_file: "/etc/letsencrypt/live/resume.kulinski.net/privkey.pem"
-        certificate_chain_file: "/etc/letsencrypt/live/resume.kulinski.net/chain.pem"
+        certificate_file: "/etc/letsencrypt/live/kulinski.net/cert.pem"
+        certificate_key_file: "/etc/letsencrypt/live/kulinski.net/privkey.pem"
+        certificate_chain_file: "/etc/letsencrypt/live/kulinski.net/chain.pem"
         extra_parameters: |
           DirectoryIndex cv.html
     certbot_auto_renew: true
@@ -61,16 +61,15 @@
     certbot_certs:
       - domains:
         - kulinski.net
+        - resume.kulinski.net
         - nonhazardo.us
         - overambitio.us
         - www.kulinski.net
         - www.nonhazardo.us
         - www.overambitio.us
-      - domains:
-        - resume.kulinski.net
     certbot_create_standalone_stop_services:
       - apache2
-  tasks:
+  pre_tasks:
     - name: remove nginx
       apt:
         name: "{{ item }}"

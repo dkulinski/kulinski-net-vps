@@ -25,16 +25,16 @@
     - name: Deploy resume.kulinski.net
       block:
         - file:
-            path: /home/dan/public_html
+            path: /var/www/cv
             state: directory
-            owner: dan
+            mode: 0660
             group: www-data
           become: true
         - copy:
             src: "files/"
-            dest: "/home/dan/public_html/"
-            mode: 0666
-      become: false
+            dest: "/var/www/cv/"
+            mode: 0660
+          become: true
       always:
       - file:
           name: /tmp/github.key
