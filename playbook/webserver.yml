@@ -82,10 +82,12 @@
       apt:
         name: openssl
         state: present
+        update_cache: yes
     - name: install git
       apt:
         name: git
         state: present
+        update_cache: yes
     - name: install webserver components
       apt:
         name: "{{ item }}"
@@ -95,11 +97,16 @@
         - build-essential
         - ruby
         - ruby-dev
-    - name: install jekyll
+    - name: install required ruby gems (jekyll, redcarpet, pygments, rouge)
       gem:
-        name: jekyll
+        name: "{{ item }}"
         user_install: no
         state: present
+      with_items:
+        - jekyll
+        - redcarpet
+        - pygments.rb
+        - rouge
     - name: create site directories
       file:
         name: "{{ item }}"

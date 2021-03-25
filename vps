@@ -1,5 +1,2 @@
 [vps]
-155.94.152.150
-
-[vps:vars]
-ansible_python_interpreter=/usr/bin/python3
+134.73.55.175

@@ -13,12 +13,6 @@
         path: '/etc/sudoers'
         regexp: '%sudo'
         line: '%sudo ALL=(ALL) NOPASSWD:ALL'
-    - name: Disable root login
-      lineinfile:
-        path: '/etc/ssh/sshd_config'
-        regexp: '^PermitRootLogin'
-        line: 'PermitRootLogin no'
-        state: present
     - name: Create salt
       command: openssl rand -hex 12
       register: salt
@@ -29,6 +23,10 @@
       command: openssl passwd -salt {{salt.stdout}} -1 {{dan_password.stdout}}
       register: enc_passwd
       when: dan_password.changed
+    - name: Add group sudo
+      group:
+        name: sudo
+        state: present
     - name: User password
       debug:
         msg: "Password for dan is {{dan_password.stdout}}"
@@ -37,7 +35,6 @@
       user: 
         name: dan
         comment: "Dan Kulinski"
-        uid: 1000
         groups: sudo,adm
         password: "{{enc_passwd.stdout}}"
         shell: "/bin/bash"
@@ -48,3 +45,10 @@
         key: "{{ lookup('file', '/home/dan/.ssh/id_rsa.pub') }}"
         manage_dir: yes
         state: present
+    - name: Disable root login
+      lineinfile:
+        path: '/etc/ssh/sshd_config'
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+ 
